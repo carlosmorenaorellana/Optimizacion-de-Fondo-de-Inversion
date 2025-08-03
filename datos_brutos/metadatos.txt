@@ -1,7 +1,7 @@
-Dataset name: Fund_data
+Nombre del Dataset: datos_fondo
 
 
-Source: 
+Fuente: 
 	* TIKR (https://www.tikr.com/) 
 		- TIKR obtiene los datos a partir de los reportes oficiales de las compañías
 		- TIKR hace algunos cálculos para obtener métricas, unas las uso y otras no
@@ -15,7 +15,7 @@ Source:
 		- Sólo he usado para obtener información muy puntual. En concreto de la columna H MAX DROP (descripción más abajo)
 
 
-Reliability:
+Fiabilidad:
 	* En general el Dataset es altamente confiable, sin embargo hay que tener en cuenta que algunas métricas se pueden calcular de varias formas con lo que el resultado puede variar desde una cantidad insignificante a una cantidad 
 	sustancial
 
@@ -26,14 +26,14 @@ Reliability:
 	* En definitiva, el dataset no está exento de "cierta subjetividad" (un inversor puede ver una oportunidad de inversión donde otro puede ver una inversión nefasta)
 
 
-Date: los datos de las empresas son a día 6 de marzo de 2025
+Fecha: los datos de las empresas son a día 6 de marzo de 2025
 
 
 
-Description: Descripción detalla del dataset
+Descripción: Descripción detalla del dataset
 
 
-Columns: Lista de columnas y su descripción. 
+Columnas: Lista de columnas y su descripción. 
 	* NAME: nombre de la empresa
 	* TICKER: código con el que la empresa cotiza en su mercado origen
 	* REGION: país donde cotiza la empresa
@@ -194,16 +194,16 @@ Comentar aquí que las empresas financieras (cuyo valor en la columna SECTOR es 
 
 
 
-Dataset name: Fund_data_with_errors
+Nombre del Dataset: datos_fondo_con_errores
 
-En este dataset básicamente le pedí a ChatGPT que metiera errores comunes como valores nulos o símbolos (asteriscos, comillas, guiones, ...) así como valores erróneos o "outliers" en el dataset original (Fund_data) a modo de simular 
+En este dataset le pedí a ChatGPT que metiera errores comunes como valores nulos o símbolos (asteriscos, comillas, guiones, ...) así como valores erróneos o "outliers" en el dataset original (Datos_fondo) a modo de simular 
 una situación realista.
 
 
 
 
 
-Dataset name: Fund_data_estimates
+Nombre del Dataset: estimaciones_datos_fondo
 
 Esto es la tabla de estimaciones, múltiplos de valoración aplicados etc... 
 
