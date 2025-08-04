@@ -1,0 +1,209 @@
+Nombre del Dataset: fund_data
+
+
+Fuente: 
+	* TIKR (https://www.tikr.com/) 
+		- TIKR obtiene los datos a partir de los reportes oficiales de las compañías
+		- TIKR hace algunos cálculos para obtener métricas, unas las uso y otras no
+
+	* Plantilla de valoración
+		- La plantilla de valoración de empresas utilizada en este proyecto ha sido adaptada a partir del material didáctico del curso de valoración de empresas de Invertir desde Cero (IDC).
+		- Relleno mi plantilla con los datos de TIKR y automáticamente se calculan las métricas correspondientes
+		- Algunas métricas cuyo cálculo es diferente a TIKR son el FCF, el CapEx de expansión y de mantenimiento o el ROIC.
+	
+	* Koyfin (https://app.koyfin.com/)
+		- Sólo he usado para obtener información muy puntual. En concreto de la columna H MAX DROP (descripción más abajo)
+
+
+Fiabilidad:
+	* En general el Dataset es altamente confiable, sin embargo hay que tener en cuenta que algunas métricas se pueden calcular de varias formas con lo que el resultado puede variar desde una cantidad insignificante a una cantidad 
+	sustancial
+
+	* Esto puede afectar a los fundamentales de la empresa actuales que a su vez repercutiría en los múltiplos de valoración
+
+	* Además los múltiplos de valoración históricos pueden verse distorsionados en muchas ocasiones no necesariamente debido a los cálculos utilizados sino debido al tipo de empresa (por ejemplo una empresa de crecimiento)
+
+	* En definitiva, el dataset no está exento de "cierta subjetividad" (un inversor puede ver una oportunidad de inversión donde otro puede ver una inversión nefasta)
+
+
+Fecha: los datos de las empresas son a día 6 de marzo de 2025
+
+
+
+Descripción: Descripción detalla del dataset
+
+
+Columnas: Lista de columnas y su descripción. 
+	* NAME: nombre de la empresa
+	* TICKER: código con el que la empresa cotiza en su mercado origen
+	* REGION: país donde cotiza la empresa
+	* SECTOR: mercado o industria principal donde opera la empresa
+	* SEGMENT: subindustria donde opera la empresa
+	* MARKET CAP: indica cuánto dinero hay en el mercado de acciones de dicha empresa
+	* E VALUE: Enterprise Value o Valor de Empresa. Es el Market Cap teniendo en cuenta la Deuda Neta
+	* PRICE: precio de la acción a día 6 de marzo de 2025
+	* H REV GROWTH: tasa interanual del crecimiento histórico (la H hace referencia a "Historic", refiriéndome a los 10 años anteriores. Se cumple para todas las columnas con H) de los ingresos (Revenues)
+	* H EPS GROWTH: tasa interanual del crecimiento del beneficio por acción (Earning Per Share, EPS)
+	* H FCF GROWTH: tasa interanual del crecimiento del flujo de caja libre (Free Cash Flow, FCF)
+
+		- El FCF representa el efectivo que la compañía genera en un ejercicio fiscal. Además en el estado financiero del Flujo de caja o Cash Flow (CF) también nos da información sobre la gestión de capital de la empresa, es 
+		decir, qué hacen con el FCF que generan (destinarlo a CapEx de Expansión o crecimiento orgánico, hacer adquisiciones o M&A (crecimiento inorgánico), pagar dividendos, recomprar acciones, amortizar deuda o no hacer nada)
+
+		- Sin embargo es una métrica NON-GAAP, es decir, que no está regulada. Esto significa que las empresas no están obligadas a reportar esta métrica y si lo hacen no es fiable porque no hay una forma establecida de 
+		calcularla
+
+
+		- Cálculo de FCF: FCF = EBIT + D&A - Intereses - Impuestos - Variación de Working Capital - CapEx de Mantenimiento
+
+			* El EBIT es el beneficio antes de intereses e impuestos o Beneficio operativo (es una métrica totalmente común, además esta si es una métrica GAAP, con lo que en general es absolutamente fiable)
+
+			* D&A es la depreciación y amortización, debemos sumarla porque no supone una salida real de caja, es simplemente un gasto contable o "teórico" y puesto que se resta en la cuenta de pérdidas y ganancias ahora 
+			debemos sumarlo (hay que tener cuidado en empresas que se atienen a la normativa IFRS 16, la cual aumenta sustancialmente la D&A y en consecuencia el FCF, lo que podría reflejar un FCF mejor de lo que es en 
+			realidad)
+
+			* Intereses e Impuestos, ambos son gastos que suponen una salida real de caja
+
+			* la Variación de Working Capital (WC) puede significar una entrada o una salida de caja, es una métrica que nos da información sobre la liquidez de la empresa y de si su operativa se deteriora o mejora.
+
+				- El WC indica el dinero que la compañía necesita para poder llevar a cabo su operativa diaria (para que su negocio funcione y genere ingresos)
+
+				- Hay dos tipos de empresas en lo que respecta al WC. Empresas con WC negativo o con WC positivo.
+
+					* WC negativo: la empresa es financiada por el proveedor. Esto es bueno, pero si hay una mala gestión (a esa entrada de dinero se le da un mal uso) y los ingresos disminuyen puede haber riesgo de 
+					quiebra por lo que puede ser peligroso (sobretodo en negocios cíclicos), porque necesitarán poner ese dinero, que el negocio necesita, de su bolsillo (del FCF, del banco, etc) 
+
+					* WC positivo: la empresa debe financiar su propia operativa. Generalmente es peor porque la empresa debe "gastar" antes de ingresar. Esto puede llevar a tener problemas de liquidez sin embargo 
+					son mucho más resilientes que las anteriores.
+
+				- Cálculo: WC = Inventarios + cuentas por cobrar - cuentas por pagar. 
+				- Ahora, la Variación de WC es tomar el valor de WC del año anterior respecto del año actual, si el valor es negativo indica que a la empresa le "sobra" dinero (dinero que puede usar para crecer por 
+				ejemplo), y si es positivo quiere decir que la empresa ha tenido que aportar dinero (reducir el FCF) para su WC (o su operativa de negocio)
+
+			* El CapEx: es el gasto en capital y las empresas lo proporcionan como CapEx Total, sin embargo se divide en dos tipos:
+
+				- CapEx de Expansión: cantidad que una empresa gasta o "invierte" en el propio negocio (comprar más locales, más maquinaria, un software mejor, etc)
+
+				- CapEx de Mantenimiento: cantidad que una empresa gasta en reparar o cambiar y mantener los activos que ya posee (si se rompe una máquina sustituirla por una igual nueva, pagar a una empresa de 
+				mantenimiento de un inmueble, ...) 
+
+				- El problema es que las empresas no desglosan cuanto gastan en cada uno, lo dan todo mezclado en el CapEx Total. Pero hay formas de obtenerlo de forma apróximada
+
+				- Hay una correlación grande con que el CapEx de Mantenimiento suele ser muy parecido al valor de la D&A, por lo tanto: 
+
+					* si: CapEx Total > D&A entonces: D&A = CapEx de Mantenimiento; por consiguiente, CapEx de Expansión = CapEx Total - D&A 
+
+					* si: CapEx Total < D&A entonces: CapEx Total = CapEx de Mantenimiento y se descarta que haya CapEx de Expansión
+
+
+	* H OP MARGIN: media histórica del margen operativo (Operative Margin). El EBIT lo obtengo de TIKR. Cálculo: (beneficio operativo (o EBIT)/Ventas)*100
+	* H FCF MARGIN: media histórica del margen FCF. El FCF lo obtengo del cálculo explicado anteriormente. Cálculo del margen FCF: (FCF/Ventas)*100 
+	* H ORGANIC: media histórica del FCF empleado en la inversión en el propio negocio. El CapEx de Expansión o crecimiento orgánico lo obtengo del cálculo explicado anteriormente. Cálculo: (CapEx Expansión/FCF)*100
+	* H INORGANIC: media histórica del FCF empleado en fusiones y adquisiciones (Merger and Adcquisition, M&A). El M&A lo obtengo de TIKR. (M&A/FCF)*100 
+	* H DIVIDENDS: media histórica del FCF empleado en pagar dividendos. Los dividendos los obtengo de TIKR. (Dividends/FCF)*100 
+	* H REPURCHASES: media histórica del FCF empleado en recomprar acciones (eliminar acciones en circulación). (Repurchases/FCF)*100
+	* H DEBT AMORTIZATION: media histórica del FCF empleado en amortizar deuda. La deuda la obtengo de TIKR. ((Debt repaid- Debt issued)/FCF)*100
+	* H ROIC: media histórica del retorno sobre el capital invertido
+
+		- El ROIC es una métrica de rentabilidad CLAVE para el inversor cuyo resultado indica cuan rentable es una empresa en términos de NOPAT (Beneficio operativo neto después de impuestos)
+
+		- Otra forma de entenderlo es que si por ejemplo el ROIC es 20%, la empresa genera un retorno de 0,2$ como NOPAT por cada 1$ que invierte en su propio negocio (CapEx de Expansión)
+
+		- Esto significa que aumenta el margen operativo
+
+		- Lógicamente una empresa con un alto ROIC y con un mínimo de CapEx de Expansión (o crecimiento orgánico) es sinónimo de una excelente sinergia
+
+		- También señalar que el ROIC tiene una gran correlación con las ventajas competitivas de la empresa, pero debe ser estable y duradero a lo largo de los años
+
+
+		- Cálculo de ROIC: ROIC = (EBIT*(1-T)/CI)*100; donde:
+		 
+			* EBIT = Beneficio antes de intereses e impuestos
+
+			* T = tasa impositiva
+
+			* CI = capital invertido;
+
+
+		- Cáculo de CI: CI = patrimonio neto + alquileres operativos totales + deuda financiera total - valor negociable + fondo de comercio (si hay)
+
+			* El patrimonio neto es el valor contable de la empresa que pertence a los accionistas
+
+			* Alquileres operativos son el valor de los contratos de alquiler operativo a largo plazo, por lo que es dinero que debe o mejor dicho, deberá
+
+			* Deuda financiera total representa las obligaciones financieras que tiene la empresa (préstamos u otras deudas)
+
+			* Valor negociable son las inversiones líquidas a corto plazo que tiene la empresa. Se resta porque son inversiones cuya intención no es mejorar la operativa (inversiones a corto plazo como bonos por ejemplo)
+
+			* Fondo de comercio o "Goodwill" representa el exceso del precio de compra sobre el valor razonable de los activos netos que la empresa recibe en una adquisición (sólo se añade a la fórmula si hay adquisiciones)
+
+
+	* H DEBT NET EBITDA: media histórica del ratio Deuda Neta/EBITDA (un múltiplo para medir el apalancamiento). Obtenido de la plantilla
+	* H PER: media histórica del ratio Precio/Beneficio, PER. Indica el número de años que tardaría la empresa en generar beneficios equivalentes al precio actual de la acción (si el beneficio fuese el mismo durante esos años)		
+	* H EVFCF: media histórica del ratio Valor Empresa/Flujo de Caja Libre, EV/FCF. Indica el número de años que tardaría la empresa en generar FCF equivalente al EV (si el FCF se mantuviera igual)
+
+		- Tanto el múltiplo PER como el EV/FCF histórico lo he extraído de los datos de TIKR, normalmente hay que normalizarlo teniendo en cuenta períodos "especiales" como de alto crecimiento, generación de caja negativa o 
+		crisis por ejemplo
+
+		- No todos los sectores se valoran a un mismo múltiplo. 
+
+			* El sector "Utilities" (empresas de energía como Iberdrola, por ejemplo) cotiza a un EV/FCF altísimo o a uno negativo debido a que no generan FCF o generan muy poco.
+			
+			* Tampoco sirve para valorar una compañía financiera debido a la naturaleza del sector (apalancada)
+
+		- Dicho esto, hay que tener en cuenta que en la aplicación de un múltiplo existe un componente subjetivo. Yo me baso en la relación de crecimiento/valoración, en la calidad del negocio y en las estimaciones de 
+		crecimiento, margen de beneficio, etc
+
+			* Por ejemplo si una empresa desde 2015 a 2020 creció a tasas del 20% y se ha valorado a 40x EV/FCF y, sin haber cambiado nada del negocio, las estimaciones de crecimiento de 2020 a 2025 son del 10%, mi 
+			valoración sería de 20x EV/FCF. Sin embargo, si la empresa es de calidad podría aumentar ese múltiplo a 25x o incluso a 30x. Una empresa de calidad tendría las siguientes características:
+
+				- tiene grandes ventajas competitivas o Moats (como Escala, Coste de Cambio o "Switching Cost", Poder de Marca, Propiedad Intelectual , "Pricing Power", Efecto Red, o incluso podría ser un monopolio)
+
+				- el modelo de negocio está bien posicionado de cara a futuro y tiene poco riesgo de sufrir una disrupción
+
+				- tiene gran visibilidad de ingresos (por ejemplo una empresa cuyos ingresos mayoritarios se basan en suscripciones o en contratos plurianuales tendría una gran visibilidad de ventas)
+
+				- tiene una gran cuota de mercado y además es estable
+
+				- tiene muy poco apalancamiento (o endeudamiento), se considera aceptable que una empresa esté endeudada por debajo de 2,5x deuda neta/EBITDA. Pero hay negocios y sectores que funcionan con mucha más 
+				deuda, ya bien sean empresas en concreto o sectores como el financiero 
+			
+				- la directiva está alineada con el accionista (gestión de capital, incentivos basados en el rendimiento de métricas clave como el ROIC, el EPS o incluso el CAGR)
+
+
+	* H MAX DROP: la caída más grande del precio de la acción en los últimos 5 años. Lo he obtenido de ver los gráficos de las compañías de una página de información sobre acciones llamada Koyfin
+	* H CAGR: la media histórica anual del crecimiento del precio de la acción en los últimos 10 años. Lo he obtenido de la página TIKR
+
+	* C OP MARGIN: margen operativo sobre ventas actual (la "C" es de "Current". Se refiere al último año fiscal y se cumple para todas las columnas que tengan la "C" delante). Obtenido de TIKR
+	* C FCF MARGIN: margen FCF sobre ventas actual o del último año fiscal. Obtenido del cálculo ya explicado anteriormente 
+	* C ORGANIC: porcentaje de FCF sobre ventas empleado en la inversión en el propio negocio en el último año fiscal. Obtenido del cálculo ya explicado anteriormente 
+	* C INORGANIC: porcentaje de FCF sobre ventas empleado en M&A en el último año fiscal. Obtenido del cálculo ya explicado anteriormente 
+	* C DIVIDENDS: porcentaje de FCF sobre ventas empleado en pagar dividendos en el último año fiscal. Obtenido del cálculo ya explicado anteriormente 
+	* C REPURCHASES: porcentaje de FCF sobre ventas empleado en recompras de acciones en el último año fiscal. Obtenido del cálculo ya explicado anteriormente 
+	* C DEBT AMORTIZATION: porcentaje de FCF sobre ventas empleado en la amortización de deuda en el último año fiscal. Obtenido del cálculo ya explicado anteriormente 
+	* C ROIC: ROIC del último año fiscal. Obtenido del cálculo ya explicado anteriormente 		
+	* C DEBT NET EBITDA: ratio Deuda Neta/EBITDA del último año fiscal. Obtenido de la plantilla
+	* C PER: ratio Precio/Beneficio al que cotiza la empresa al precio actual. Obtenido de la plantilla
+	* C EVFCF: ratio EV/FCF al que cotiza la empresa al precio actual. Obtenido de la plantilla
+	* C DROP: caída acumulada actual del precio por acción desde máximos históricos. Obtenido de Koyfin
+
+Comentar aquí que las empresas financieras (cuyo valor en la columna SECTOR es "Financial") no generan FCF y no se puede estimar correctamente la gestión de capital, además de no ser útil el ROIC. Por esto han sido valoradas por PER.
+
+
+
+
+
+
+
+Nombre del Dataset: fund_data_with_errors
+
+En este dataset le pedí a ChatGPT que metiera errores comunes como valores nulos o símbolos (asteriscos, comillas, guiones, ...) así como valores erróneos o "outliers" en el dataset original (fund_data) a modo de simular 
+una situación realista.
+
+
+
+
+
+Nombre del Dataset: fund_data_estimates
+
+Esto es la tabla de estimaciones, múltiplos de valoración aplicados etc... 
+

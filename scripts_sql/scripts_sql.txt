@@ -1,0 +1,178 @@
+-- Sentencia 1: Explorar los datos iniciales y ordenar la tabla por nombre para una mejor visualización.
+SELECT *
+FROM `beaming-prism-442915-i2.fund_data.fund_portfolio`
+ORDER BY NAME;
+
+
+-- Sentencia 2: Crear una tabla de respaldo (backup) de los datos originales.
+CREATE TABLE `beaming-prism-442915-i2.fund_data.fund_portfolio_backup` AS
+SELECT *
+FROM `beaming-prism-442915-i2.fund_data.fund_portfolio`;
+
+
+-- Sentencia 3: Limpiar los datos de las columnas de texto (NAME, TICKER, REGION, SECTOR, SEGMENT).
+-- Se utiliza REGEXP_REPLACE para eliminar caracteres especiales como asteriscos, guiones y comillas dobles.
+CREATE OR REPLACE TABLE `beaming-prism-442915-i2.fund_data.fund_portfolio` AS
+SELECT
+  REGEXP_REPLACE(NAME, r'[\*\-"]', '') AS NAME,
+  REGEXP_REPLACE(TICKER, r'[\*\-"]', '') AS TICKER,
+  REGEXP_REPLACE(REGION, r'[\*\-"]', '') AS REGION,
+  REGEXP_REPLACE(SECTOR, r'[\*\-"]', '') AS SECTOR,
+  REGEXP_REPLACE(SEGMENT, r'[\*\-"]', '') AS SEGMENT,
+  `MARKET CAP`,
+  `E VALUE`,
+  `PRICE`,
+  `H REV GROWTH`,
+  `H EPS GROWTH`,
+  `H FCF GROWTH`,
+  `H OP MARGIN`,
+  `H FCF MARGIN`,
+  `H ORGANIC`,
+  `H INORGANIC`,
+  `H DIVIDENDS`,
+  `H REPURCHASES`,
+  `H DEBT AMORTIZATION`,
+  `H ROIC`,
+  `H DEBT NET EBITDA`,
+  `H PER`,
+  `H EVFCF`,
+  `H MAX DROP`,
+  `H CAGR`,
+  `C OP MARGIN`,
+  `C FCF MARGIN`,
+  `C ORGANIC`,
+  `C INORGANIC`,
+  `C DIVIDENDS`,
+  `C REPURCHASES`,
+  `C DEBT AMORTIZATION`,
+  `C ROIC`,
+  `C DEBT NET EBIDA`,
+  `C PER`,
+  `C EVFCF`,
+  `C DROP`
+FROM `beaming-prism-442915-i2.fund_data.fund_portfolio`;
+
+
+-- Sentencia 4: Contar los valores nulos para identificar qué columnas necesitan ser rellenadas.
+SELECT
+    COUNTIF(NAME IS NULL) AS NAME_NULO,
+    COUNTIF(TICKER IS NULL) AS TICKER_NULO,
+    COUNTIF(REGION IS NULL) AS REGION_NULO,
+    COUNTIF(SECTOR IS NULL) AS SECTOR_NULO,
+    COUNTIF(`MARKET CAP` IS NULL) AS MC_NULO,
+    COUNTIF(`E VALUE` IS NULL) AS EV_NULO,
+    COUNTIF(PRICE IS NULL) AS PRICE_NULO,
+    COUNTIF(`H REV GROWTH` IS NULL) AS H_REV_GROWTH,
+    COUNTIF(`H EPS GROWTH` IS NULL) AS H_EPS_GROWTH,
+    COUNTIF(`H PER` IS NULL) AS H_PER,
+    COUNTIF(`H MAX DROP` IS NULL) AS H_MAX_DROP,
+    COUNTIF(`C PER` IS NULL) AS C_PER,
+    COUNTIF(`C DROP` IS NULL) AS C_DROP
+FROM `beaming-prism-442915-i2.fund_data.fund_portfolio`;
+
+
+-- Sentencia 5: Filtrar las filas que contienen valores nulos en columnas clave para su posterior análisis.
+SELECT *
+FROM `beaming-prism-442915-i2.fund_data.fund_portfolio`
+WHERE `MARKET CAP` IS NULL
+      OR `E VALUE` IS NULL
+      OR PRICE IS NULL
+      OR `C PER` IS NULL;
+
+
+-- Sentencia 6: Unir la tabla original con la tabla de datos nulos para rellenar los valores faltantes.
+-- Se utiliza COALESCE para mantener el valor original si no es nulo y usar el de la tabla de nulos si lo es.
+CREATE OR REPLACE TABLE `beaming-prism-442915-i2.fund_data.fund_portfolio` AS
+SELECT
+  t1.* EXCEPT(`MARKET CAP`, `E VALUE`, PRICE, `C PER`),
+  COALESCE(t2.`MARKET CAP`, t1.`MARKET CAP`) AS `MARKET CAP`,
+  COALESCE(t2.`E VALUE`, t1.`E VALUE`) AS `E VALUE`,
+  COALESCE(t2.PRICE, t1.PRICE) AS PRICE,
+  COALESCE(t2.`C PER`, t1.`C PER`) AS `C PER`
+FROM `beaming-prism-442915-i2.fund_data.fund_portfolio` AS t1
+LEFT JOIN `beaming-prism-442915-i2.fund_data.fund_data_null` AS t2
+  ON t1.TICKER = t2.TICKER;
+
+
+-- Sentencia 7: Unir la tabla principal con la de estimaciones para añadir los datos de previsión.
+CREATE OR REPLACE TABLE `beaming-prism-442915-i2.fund_data.fund_portfolio_final` AS
+SELECT
+  t1.*,
+  t2.`E REV GROWTH`,
+  t2.`E EPS GROWTH`,
+  t2.`E FCF GROWTH`,
+  t2.`E OP MARGIN`,
+  t2.`E FCF MARGIN`,
+  t2.`E DEBT NET EBITDA`,
+  t2.`E PER`,
+  t2.`E EVFCF`,
+  t2.`PRICE PESIMIST`,
+  t2.`CY MOS PESIMIST`,
+  t2.`OY MOS PESIMIST`,
+  t2.`5Y CAGR PESIMIST`,
+  t2.`PRICE NEUTRAL`,
+  t2.`CY MOS NEUTRAL`,
+  t2.`OY MOS NEUTRAL`,
+  t2.`5Y CAGR NEUTRAL`
+FROM `beaming-prism-442915-i2.fund_data.fund_portfolio` AS t1
+LEFT JOIN `beaming-prism-442915-i2.fund_data.estimates_data` AS t2
+  ON t1.TICKER = t2.TICKER;
+
+
+-- Sentencia 8: Corregir el formato de las columnas de porcentaje.
+-- Se multiplican por 100 las columnas que estaban en formato decimal para que representen porcentajes.
+CREATE OR REPLACE TABLE `beaming-prism-442915-i2.fund_data.fund_portfolio_final_corrected` AS
+SELECT
+  `NAME`,
+  `TICKER`,
+  `REGION`,
+  `SECTOR`,
+  `SEGMENT`,
+  `MARKET CAP`,
+  `E VALUE`,
+  `PRICE`,
+  `H REV GROWTH` * 100 AS `H REV GROWTH`,
+  `H EPS GROWTH` * 100 AS `H EPS GROWTH`,
+  `H FCF GROWTH` * 100 AS `H FCF GROWTH`,
+  `H OP MARGIN` * 100 AS `H OP MARGIN`,
+  `H FCF MARGIN` * 100 AS `H FCF MARGIN`,
+  `H ORGANIC` * 100 AS `H ORGANIC`,
+  `H INORGANIC` * 100 AS `H INORGANIC`,
+  `H DIVIDENDS` * 100 AS `H DIVIDENDS`,
+  `H REPURCHASES` * 100 AS `H REPURCHASES`,
+  `H DEBT AMORTIZATION` * 100 AS `H DEBT AMORTIZATION`,
+  `H ROIC` * 100 AS `H ROIC`,
+  `H DEBT NET EBITDA`,
+  `H PER`,
+  COALESCE(SAFE_CAST(`H EVFCF` AS FLOAT64), 0) AS `H EVFCF`,
+  `H MAX DROP` * 100 AS `H MAX DROP`,
+  `H CAGR` * 100 AS `H CAGR`,
+  `C OP MARGIN` * 100 AS `C OP MARGIN`,
+  `C FCF MARGIN` * 100 AS `C FCF MARGIN`,
+  `C ORGANIC` * 100 AS `C ORGANIC`,
+  `C INORGANIC` * 100 AS `C INORGANIC`,
+  `C DIVIDENDS` * 100 AS `C DIVIDENDS`,
+  `C REPURCHASES` * 100 AS `C REPURCHASES`,
+  `C DEBT AMORTIZATION` * 100 AS `C DEBT AMORTIZATION`,
+  `C ROIC` * 100 AS `C ROIC`,
+  `C DEBT NET EBIDA`,
+  `C PER`,
+  COALESCE(SAFE_CAST(`C EVFCF` AS FLOAT64), 0) AS `C EVFCF`,
+  `C DROP` * 100 AS `C DROP`,
+  `E REV GROWTH` * 100 AS `E REV GROWTH`,
+  `E EPS GROWTH` * 100 AS `E EPS GROWTH`,
+  `E FCF GROWTH` * 100 AS `E FCF GROWTH`,
+  `E OP MARGIN` * 100 AS `E OP MARGIN`,
+  `E FCF MARGIN` * 100 AS `E FCF MARGIN`,
+  `E DEBT NET EBITDA`,
+  `E PER`,
+  `E EVFCF`,
+  `PRICE PESIMIST`,
+  `CY MOS PESIMIST` * 100 AS `CY MOS PESIMIST`,
+  `OY MOS PESIMIST` * 100 AS `OY MOS PESIMIST`,
+  `5Y CAGR PESIMIST` * 100 AS `5Y CAGR PESIMIST`,
+  `PRICE NEUTRAL`,
+  `CY MOS NEUTRAL` * 100 AS `CY MOS NEUTRAL`,
+  `OY MOS NEUTRAL` * 100 AS `OY MOS NEUTRAL`,
+  `5Y CAGR NEUTRAL` * 100 AS `5Y CAGR NEUTRAL`
+FROM `beaming-prism-442915-i2.fund_data.fund_portfolio_final`;
